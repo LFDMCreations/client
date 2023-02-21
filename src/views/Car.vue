@@ -26,8 +26,8 @@ const { jwt } = storeToRefs(UserStore)
 const router = useRouter()
 const route = useRoute()
 
-//const baseUrl = "https://apijwt.osc-fr1.scalingo.io"
-const baseUrl = "http://localhost:9292"
+const baseUrl = "https://apijwt.osc-fr1.scalingo.io"
+//const baseUrl = "http://localhost:9292"
 
 const car = ref('')
 
