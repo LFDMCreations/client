@@ -41,6 +41,9 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
+//const url = "https://apijwt.osc-fr1.scalingo.io"
+const url = "http://localhost:9292"
+
 const loginResp = ref(false)
 const gotCars = ref(false)
 const cars = ref('')
@@ -82,7 +85,7 @@ async function getData(url = '', headers = {}) {
 }
 const login = () => {
 
-  fetch('https://apijwt.osc-fr1.scalingo.io/auth/login', {
+  fetch(`${url}/auth/login`, {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -120,7 +123,7 @@ const getCars = () => {
     'Content-Type': 'application/json', 
     '__auth__': jwt.value
   }
-  getData('https://apijwt.osc-fr1.scalingo.io/data/cars', headers)
+  getData(`${url}/data/cars`, headers)
   .then((response) => {
     gotCars.value = true
     cars.value = response.reason
@@ -128,7 +131,7 @@ const getCars = () => {
 }
 
 async function getjwt() {
-  await getData('https://apijwt.osc-fr1.scalingo.io/auth/getjwt')
+  await getData(`${url}/auth/getjwt`)
   .then((response) => {
    
   })

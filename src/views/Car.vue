@@ -26,6 +26,9 @@ const { jwt } = storeToRefs(UserStore)
 const router = useRouter()
 const route = useRoute()
 
+//const baseUrl = "https://apijwt.osc-fr1.scalingo.io"
+const baseUrl = "http://localhost:9292"
+
 const car = ref('')
 
 onMounted(() => {
@@ -52,7 +55,7 @@ const getCar = () => {
     'Content-Type': 'application/json', 
     '__auth__': jwt.value
   }
-  let url = `https://apijwt.osc-fr1.scalingo.io/data/car/${route.params.id}`
+  let url = `${baseUrl}/data/car/${route.params.id}`
   getData(url, headers)
   .then((response) => {
     if (response.status === 200) {
