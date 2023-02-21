@@ -52,7 +52,7 @@ const getCar = () => {
     'Content-Type': 'application/json', 
     '__auth__': jwt.value
   }
-  let url = `http://localhost:9292/data/car/${route.params.id}`
+  let url = `https://apijwt.osc-fr1.scalingo.io/data/car/${route.params.id}`
   getData(url, headers)
   .then((response) => {
     if (response.status === 200) {

@@ -82,7 +82,7 @@ async function getData(url = '', headers = {}) {
 }
 const login = () => {
 
-  fetch('http://localhost:9292/auth/login', {
+  fetch('https://apijwt.osc-fr1.scalingo.io/auth/login', {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -120,7 +120,7 @@ const getCars = () => {
     'Content-Type': 'application/json', 
     '__auth__': jwt.value
   }
-  getData('http://localhost:9292/data/cars', headers)
+  getData('https://apijwt.osc-fr1.scalingo.io/data/cars', headers)
   .then((response) => {
     gotCars.value = true
     cars.value = response.reason
@@ -128,7 +128,7 @@ const getCars = () => {
 }
 
 async function getjwt() {
-  await getData('http://localhost:9292/auth/getjwt')
+  await getData('https://apijwt.osc-fr1.scalingo.io/auth/getjwt')
   .then((response) => {
    
   })
