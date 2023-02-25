@@ -21,7 +21,7 @@
       <input class="mb-4" type="text" placeholder="nom" v-model="moi.name"  >
       <input class="mb-4" type="password" placeholder="mot de passe" v-model="moi.password" >
 
-      <div @click="login(moi)">s'indentifier</div>
+      <div @click="login(moi)">s'identifier</div>
     
       {{ loginMessage }}
 
@@ -41,18 +41,22 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-const url = "https://apijwt.osc-fr1.scalingo.io"
-//const url = "http://localhost:9292"
+//const url = "https://apijwt.osc-fr1.scalingo.io"
+const url = "http://localhost:9292"
 
 const loginResp = ref(false)
 const gotCars = ref(false)
 const cars = ref('')
 
 const UserStore = useUserStore()
-const { jwt } = storeToRefs(UserStore)
+const { jwt, refresh } = storeToRefs(UserStore)
 
 const loginMessage = ref("")
 const resp = ref('')
+
+function between(x, min, max) {
+  return x >= min && x <= max;
+}
 
 async function postData(url = '', data = {}, headers = {}) {
   // Default options are marked with *
@@ -69,9 +73,8 @@ async function postData(url = '', data = {}, headers = {}) {
   return response; // parses JSON response into native JavaScript objects
 }
 
-async function getData(url = '', headers = {}) {
-  // Default options are marked with *
-  const response = await fetch(url, {
+async function getData(url='', headers = {}) {
+  let r = await fetch(url, {
     method: 'GET', // *GET, POST, PUT, DELETE, etc.
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -81,36 +84,57 @@ async function getData(url = '', headers = {}) {
     referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     //body: JSON.stringify(data) // body data type must match "Content-Type" header
   });
-  return response.json(); // parses JSON response into native JavaScript objects
-}
-const login = () => {
+  return r.json()
 
-  fetch(`${url}/auth/login`, {
-    method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
-    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'include', // include, *same-origin, omit
-    headers: { 'Content-Type': 'application/json' },
-    redirect: 'follow', // manual, *follow, error
-    referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-    body: JSON.stringify(moi) // body data type must match "Content-Type" header
-  })
+  // if (response.status === 200) {
+  //   return response.json(); // parses JSON response into native JavaScript objects
+  // } else {
+  //   console.log("erreur token")
+  // }
+}
+
+async function getjwt() {
+  let adresse = `${url}/auth/getjwt`
+  let headers = { 'Content-Type': 'application/json' }
+  postData(adresse, refresh.value, headers)
   .then((response) => {
-    moi.name = ''
-    moi.password = ''
     if (response.status === 200) {
-      jwt.value = response.headers.get('__auth__')
-      loginMessage.value = "identification réussie"
+      jwt.value = response.headers.get('__auth__')  
+    }
+  })
+  .catch((err) => { alert(err) })
+}
+
+const login = () => {
+  
+  let adresse = `${url}/auth/login`
+  let headers = { 'Content-Type': 'application/json' }
+
+  postData(adresse, moi, headers)
+  .then((response) => {
+    if (response.status === 200) {
+      jwt.value = response.headers.get('__auth__')  
+    } 
+    return response.json()
+  })
+  .then((data) => {
+    setTimeout(() => {
+      moi.name = ''
+      moi.password = ''
+    }, 2000)
+    if (between(data.status, 200, 299)) {
+      refresh.value = data.reason
+      loginMessage.value = "Identification réussie"
       setTimeout(() => {
         loginMessage.value = ""
         getCars()
       }, 2000)
     } else {
-
-      loginMessage.value = "échec d'identification"
+      loginMessage.value = data.reason
+      setTimeout(() => { loginMessage.value = "" }, 2000)
     }
   })
-  .catch((err) => {alert(err)})
+  .catch((err) => alert(err))
 }
 
 const moi = reactive({
@@ -124,22 +148,11 @@ const getCars = () => {
     '__auth__': jwt.value
   }
   getData(`${url}/data/cars`, headers)
-  .then((response) => {
+  .then((response) => { 
     gotCars.value = true
     cars.value = response.reason
   })
 }
-
-async function getjwt() {
-  await getData(`${url}/auth/getjwt`)
-  .then((response) => {
-   
-  })
-  .catch((err) => {
-    throw(err)
-  })
-}
-
 
 </script>
 
