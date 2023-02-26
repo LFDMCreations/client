@@ -41,8 +41,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-//const url = "https://apijwt.osc-fr1.scalingo.io"
-const url = "http://localhost:9292"
+const url = "https://apijwt.osc-fr1.scalingo.io"
+//const url = "http://localhost:9292"
 
 const loginResp = ref(false)
 const gotCars = ref(false)
